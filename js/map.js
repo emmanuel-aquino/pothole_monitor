@@ -7,7 +7,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 function loadPotholes() {
-    fetch("http://127.0.0.1:8000/potholes")
+    fetch("https://potholemonitor-production.up.railway.app/potholes")
         .then(res => {
             if (!res.ok) throw new Error("Error en la red");
             return res.json();

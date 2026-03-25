@@ -7,7 +7,7 @@ document.getElementById("camera").addEventListener("change", function () {
 	formData.append("lat", position.coords.latitude);
 	formData.append("lon", position.coords.longitude);
 	document.getElementById("status").innerText = "Analizando imagen con IA...";
-	fetch("http://127.0.0.1:8000/predict/", {
+	fetch("https://potholemonitor-production.up.railway.app/predict/", {
 	    method: "POST",
 	    body: formData
 	})
