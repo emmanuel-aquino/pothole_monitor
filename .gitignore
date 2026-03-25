@@ -1,0 +1,26 @@
+# Backend - do not push
+main.py
+pothole_model.h5
+firebase_key.json
+requirements.txt
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Windows metadata files
+*.Zone.Identifier
+
+# Jupyter / Colab artifacts
+*.ipynb
+.ipynb_checkpoints/
+
+# Virtual environments
+venv/
+.env/
+env/
+
+# Misc
+indicaciones.txt
+*.log

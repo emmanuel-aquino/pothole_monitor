@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta charset="UTF-8">
+		<title>Sistema de Monitoreo Vial</title>
+		<link rel="stylesheet" href="css/style.css">
+	</head>
+
+	<body>
+
+		<header>
+			<img src="https://cdn-icons-png.flaticon.com/512/854/854878.png" class="logo">
+			<h1>Sistema Inteligente de Monitoreo Vial</h1>
+			<p>Detección automática de baches con Inteligencia Artificial</p>
+		</header>
+
+		<div class="container">
+			<div class="card">
+			<h2>Reportar posible bache</h2>
+			<input type="file" accept="image/*" capture="environment" id="camera" hidden>
+			<button onclick="document.getElementById('camera').click()">📸 Tomar Foto</button>
+			<div class="status" id="status">Esperando imagen...</div>
+			<div class="result" id="result"></div>
+			</div>
+		</div>
+		<script src="js/script.js"></script>
+	</body>
+</html>
