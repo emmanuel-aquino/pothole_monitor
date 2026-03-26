@@ -9,18 +9,34 @@
 	<body>
 
 		<header>
-			<img src="https://cdn-icons-png.flaticon.com/512/854/854878.png" class="logo">
+			<a href="map.html">
+				<img src="https://cdn-icons-png.flaticon.com/512/854/854878.png" class="logo" title="Ver mapa">
+			</a>
 			<h1>Sistema Inteligente de Monitoreo Vial</h1>
 			<p>Detección automática de baches con Inteligencia Artificial</p>
 		</header>
 
 		<div class="container">
 			<div class="card">
-			<h2>Reportar posible bache</h2>
-			<input type="file" accept="image/*" capture="environment" id="camera" hidden>
-			<button onclick="document.getElementById('camera').click()">📸 Tomar Foto</button>
-			<div class="status" id="status">Esperando imagen...</div>
-			<div class="result" id="result"></div>
+				<h2>Reportar posible bache</h2>
+
+				<div class="model-switch">
+					<label class="switch-label">
+						<span id="model-label-tf" class="active-label">TensorFlow</span>
+						<div class="toggle-wrapper">
+							<input type="checkbox" id="model-toggle">
+							<span class="slider"></span>
+						</div>
+						<span id="model-label-yolo">YOLO</span>
+					</label>
+					<div class="model-badge" id="model-badge">Modelo activo: TensorFlow</div>
+				</div>
+
+				<input type="file" accept="image/*" capture="environment" id="camera" hidden>
+				<button onclick="document.getElementById('camera').click()">📸 Tomar Foto</button>
+				<div class="status" id="status">Esperando imagen...</div>
+				<div class="result" id="result"></div>
+				<canvas id="bbox-canvas" style="display:none; max-width:100%; margin-top:15px; border-radius:6px;"></canvas>
 			</div>
 		</div>
 		<script src="js/script.js"></script>

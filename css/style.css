@@ -44,3 +44,71 @@ button:hover{
     font-size:20px;
     font-weight:bold;
 }
+header a {
+    display: inline-block;
+}
+header a img.logo {
+    transition: opacity 0.2s;
+}
+header a:hover img.logo {
+    opacity: 0.8;
+}
+.model-switch {
+    margin-bottom: 20px;
+}
+.switch-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    user-select: none;
+}
+.switch-label span {
+    color: #aaa;
+    transition: color 0.2s;
+}
+.switch-label span.active-label {
+    color: #2c3e50;
+    font-weight: bold;
+}
+.toggle-wrapper {
+    position: relative;
+    width: 48px;
+    height: 26px;
+}
+.toggle-wrapper input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.slider {
+    position: absolute;
+    inset: 0;
+    background: #3498db;
+    border-radius: 26px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+.slider:before {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: 3px;
+    top: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+.toggle-wrapper input:checked + .slider {
+    background: #e67e22;
+}
+.toggle-wrapper input:checked + .slider:before {
+    transform: translateX(22px);
+}
+.model-badge {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #666;
+}
