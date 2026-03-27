@@ -8,7 +8,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 import os
 import json
-from ultralytics import YOLO
+import onnxruntime as ort
 
 app = FastAPI()
 app.add_middleware(
@@ -22,8 +22,9 @@ app.add_middleware(
 # Load TensorFlow model
 tf_model = tf.keras.models.load_model("pothole_model.h5")
 
-# Load YOLO model
-yolo_model = YOLO("PotholeTestModel.pt")
+# Load YOLO model (ONNX)
+yolo_session = ort.InferenceSession("PotholeTestModel.onnx", providers=["CPUExecutionProvider"])
+yolo_input_name = yolo_session.get_inputs()[0].name
 
 # Firebase config
 firebase_key = json.loads(os.environ["FIREBASE_KEY"])
@@ -32,6 +33,8 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 IMG_SIZE = 128
+YOLO_SIZE = 640
+CONF_THRESHOLD = 0.25
 
 def preprocess_tf(image_bytes):
     npimg = np.frombuffer(image_bytes, np.uint8)
@@ -44,17 +47,27 @@ def preprocess_tf(image_bytes):
 def run_yolo(image_bytes):
     npimg = np.frombuffer(image_bytes, np.uint8)
     img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
-    h, w = img.shape[:2]
-    results = yolo_model(img)[0]
+    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img_resized = cv2.resize(img_rgb, (YOLO_SIZE, YOLO_SIZE))
+    img_input = np.transpose(img_resized, (2, 0, 1)).astype(np.float32) / 255.0
+    img_input = np.expand_dims(img_input, axis=0)
+
+    outputs = yolo_session.run(None, {yolo_input_name: img_input})
+
+    # YOLOv8 ONNX output: [1, 4+num_classes, 8400]
+    preds = outputs[0][0].T  # shape: [8400, 4+num_classes]
+
     detections = []
-    for box in results.boxes:
-        x1, y1, x2, y2 = box.xyxy[0].tolist()
-        conf = float(box.conf[0])
-        detections.append({
-            "x1": x1 / w, "y1": y1 / h,
-            "x2": x2 / w, "y2": y2 / h,
-            "confidence": conf
-        })
+    for pred in preds:
+        cx, cy, w, h = pred[0], pred[1], pred[2], pred[3]
+        conf = float(np.max(pred[4:]))
+        if conf >= CONF_THRESHOLD:
+            x1 = float(max(0.0, (cx - w / 2) / YOLO_SIZE))
+            y1 = float(max(0.0, (cy - h / 2) / YOLO_SIZE))
+            x2 = float(min(1.0, (cx + w / 2) / YOLO_SIZE))
+            y2 = float(min(1.0, (cy + h / 2) / YOLO_SIZE))
+            detections.append({"x1": x1, "y1": y1, "x2": x2, "y2": y2, "confidence": conf})
+
     return detections
 
 @app.post("/predict/")
