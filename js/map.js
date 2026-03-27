@@ -19,13 +19,17 @@ function loadPotholes() {
             data.forEach(p => {
                 const confidencePercent = (p.confidence * 100).toFixed(1);
                 const modelLabel = p.model === "yolo" ? "YOLO (Roboflow)" : "TensorFlow";
+                const imgTag = p.image
+                    ? `<img src="data:image/jpeg;base64,${p.image}" style="width:100%;border-radius:4px;margin-top:6px;">`
+                    : "";
 
                 L.marker([p.latitude, p.longitude])
                     .bindPopup(`
                         <strong>Bache detectado</strong><br>
                         Confianza: ${confidencePercent}%<br>
                         Modelo: ${modelLabel}
-                    `)
+                        ${imgTag}
+                    `, { maxWidth: 280 })
                     .addTo(clusterGroup);
             });
 

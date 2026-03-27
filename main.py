@@ -9,6 +9,7 @@ from firebase_admin import credentials, firestore
 import os
 import json
 import onnxruntime as ort
+import base64
 
 app = FastAPI()
 app.add_middleware(
@@ -35,6 +36,16 @@ db = firestore.client()
 IMG_SIZE = 128
 YOLO_SIZE = 640
 CONF_THRESHOLD = 0.25
+THUMB_WIDTH = 320
+THUMB_HEIGHT = 240
+THUMB_QUALITY = 60
+
+def compress_image(image_bytes):
+    npimg = np.frombuffer(image_bytes, np.uint8)
+    img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+    img = cv2.resize(img, (THUMB_WIDTH, THUMB_HEIGHT))
+    _, buffer = cv2.imencode(".jpg", img, [cv2.IMWRITE_JPEG_QUALITY, THUMB_QUALITY])
+    return base64.b64encode(buffer).decode("utf-8")
 
 def preprocess_tf(image_bytes):
     npimg = np.frombuffer(image_bytes, np.uint8)
@@ -92,7 +103,8 @@ async def predict(
                 "latitude": lat,
                 "longitude": lon,
                 "confidence": max_conf,
-                "model": "yolo"
+                "model": "yolo",
+                "image": compress_image(contents)
             })
 
         return {
@@ -112,7 +124,8 @@ async def predict(
                 "latitude": lat,
                 "longitude": lon,
                 "confidence": prediction,
-                "model": "tensorflow"
+                "model": "tensorflow",
+                "image": compress_image(contents)
             })
 
         return {"model": "tensorflow", "prediction": prediction}
